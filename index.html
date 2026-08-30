@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glyph Press</title>
+<meta name="description" content="Type once and get instant Unicode look-alike text styles plus a tap-to-copy kaomoji library — ready to paste into any app.">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Glyph Press">
+<meta name="theme-color" content="#ECEEE7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1B1C17" media="(prefers-color-scheme: dark)">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #ECEEE7;
+    --surface: #F8F9F3;
+    --text: #1C1D18;
+    --text-muted: #5B5E52;
+    --rule: rgba(28,29,24,0.14);
+    --accent: #9C6B14;
+    --accent-strong: #7A5310;
+    --on-accent: #FFFCF5;
+    --shadow: rgba(28,29,24,0.08);
+
+    --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --font-specimen: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1B1C17;
+      --surface: #232419;
+      --text: #ECEEE4;
+      --text-muted: #A7AA9B;
+      --rule: rgba(236,238,228,0.16);
+      --accent: #D9A63E;
+      --accent-strong: #E8B94F;
+      --on-accent: #1B1C17;
+      --shadow: rgba(0,0,0,0.4);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #1B1C17;
+    --surface: #232419;
+    --text: #ECEEE4;
+    --text-muted: #A7AA9B;
+    --rule: rgba(236,238,228,0.16);
+    --accent: #D9A63E;
+    --accent-strong: #E8B94F;
+    --on-accent: #1B1C17;
+    --shadow: rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; }
+
+  body { background: var(--bg); }
+
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    color: var(--text);
+    font-family: var(--font-body);
+  }
+
+  .masthead { display: flex; flex-direction: column; gap: 0.6rem; }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .wordmark {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-size: clamp(2.1rem, 7vw, 3.2rem);
+    line-height: 1.05;
+    text-wrap: balance;
+    margin: 0;
+    color: var(--text);
+  }
+
+  .dek {
+    max-width: 58ch;
+    line-height: 1.55;
+    color: var(--text-muted);
+    margin: 0;
+    font-size: 0.98rem;
+  }
+
+  .input-card {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    padding: 1.2rem 1.25rem 1rem;
+    box-shadow: 0 1px 3px var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  #input {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    line-height: 1.4;
+    border: none;
+    background: transparent;
+    resize: vertical;
+    color: var(--text);
+    outline: none;
+    min-height: 3.2rem;
+    padding: 0;
+    width: 100%;
+  }
+
+  #input::placeholder { color: var(--text-muted); opacity: 0.75; }
+
+  .input-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .ghost-btn {
+    background: none;
+    border: 1px solid var(--rule);
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.32rem 0.65rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: border-color .15s ease, color .15s ease;
+  }
+
+  .ghost-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .ghost-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .specimen-list { display: flex; flex-direction: column; }
+
+  .specimen-row {
+    display: grid;
+    grid-template-columns: 8.5rem 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.95rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .specimen-row:first-child { border-top: 1px solid var(--rule); }
+
+  .specimen-row__name {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+  }
+
+  .specimen-row__output {
+    font-family: var(--font-specimen);
+    font-size: 1.3rem;
+    line-height: 1.35;
+    color: var(--text);
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    min-height: 1.6rem;
+  }
+
+  .copy-btn {
+    justify-self: end;
+    background: var(--accent);
+    color: var(--on-accent);
+    border: none;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform .12s ease, background .15s ease, opacity .15s ease;
+  }
+
+  .copy-btn:hover:not(:disabled) { background: var(--accent-strong); }
+  .copy-btn:active:not(:disabled) { transform: scale(0.96); }
+  .copy-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .copy-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .copy-btn[data-copied="true"] { background: var(--text-muted); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .copy-btn { transition: none; }
+  }
+
+  @media (max-width: 560px) {
+    .specimen-row {
+      grid-template-columns: 1fr auto;
+      grid-template-areas: "label button" "output output";
+      row-gap: 0.5rem;
+    }
+    .specimen-row__name { grid-area: label; }
+    .copy-btn { grid-area: button; }
+    .specimen-row__output { grid-area: output; }
+  }
+
+  .section-head { display: flex; flex-direction: column; gap: 0.35rem; }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.4rem, 3vw, 1.8rem);
+    line-height: 1.15;
+    text-wrap: balance;
+    margin: 0;
+    color: var(--text);
+  }
+
+  .section-dek {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+  }
+
+  .kaomoji-section { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .kaomoji-list { display: flex; flex-direction: column; gap: 1.1rem; }
+
+  .kaomoji-category { display: flex; flex-direction: column; gap: 0.55rem; }
+
+  .kaomoji-category__label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+  }
+
+  .kaomoji-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+  .kaomoji-chip {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 0.5rem 0.85rem;
+    font-family: var(--font-specimen);
+    font-size: 1.05rem;
+    line-height: 1.2;
+    color: var(--text);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color .15s ease, transform .12s ease, background .15s ease, color .15s ease;
+  }
+
+  .kaomoji-chip:hover { border-color: var(--accent); }
+  .kaomoji-chip:active { transform: scale(0.95); }
+  .kaomoji-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .kaomoji-chip[data-copied="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kaomoji-chip { transition: none; }
+  }
+
+  .notes {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.25rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  .notes p { margin: 0; max-width: 62ch; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ---- Install banner ---- */
+  .install-banner {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.9rem;
+    padding: 0.65rem 2.75rem 0.65rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.5;
+  }
+  .install-banner.show { display: flex; }
+
+  .install-banner strong { color: var(--text); font-weight: 600; }
+
+  .install-banner__dismiss {
+    position: absolute;
+    top: 50%;
+    right: 0.6rem;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    padding: 0.3rem 0.5rem;
+    transition: color .15s ease;
+  }
+  .install-banner__dismiss:hover { color: var(--accent); }
+  .install-banner__dismiss:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<div class="install-banner" id="installBanner">
+  <span id="installBannerText"></span>
+  <button class="install-banner__dismiss" id="installBannerDismiss" type="button" aria-label="Dismiss">×</button>
+</div>
+
+<div class="page">
+  <header class="masthead">
+    <p class="eyebrow">Personal Unicode type specimen</p>
+    <h1 class="wordmark">Glyph Press</h1>
+    <p class="dek">Type once, and it's stamped into bold, script, fraktur, bubble, and a dozen other look-alike styles — plain Unicode text, ready to copy into Messages, Notes, or anywhere else on your Mac or iPhone.</p>
+  </header>
+
+  <section class="input-card">
+    <label for="input" class="sr-only">Text to convert</label>
+    <textarea id="input" rows="2" placeholder="Type something…" autofocus></textarea>
+    <div class="input-meta">
+      <span id="charCount">0 characters</span>
+      <button id="clearBtn" class="ghost-btn" type="button">Clear</button>
+    </div>
+  </section>
+
+  <section class="specimen-list" id="specimenList" aria-label="Converted styles"></section>
+
+  <section class="kaomoji-section" aria-label="Kaomoji">
+    <div class="section-head">
+      <p class="eyebrow">Expression stamps</p>
+      <h2 class="section-title">Kaomoji</h2>
+      <p class="section-dek">Tap one to copy — no typing needed.</p>
+    </div>
+    <div class="kaomoji-list" id="kaomojiList"></div>
+  </section>
+
+  <footer class="notes">
+    <p>These aren't real fonts — each style swaps letters for look-alike Unicode characters, so the result is plain text everywhere. A few styles have gaps (no digits, or a letter or two missing) and fall back to the plain character. A handful of apps strip unusual Unicode from certain fields, so test once before relying on it.</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  function buildAlpha(upperStart, lowerStart, upperHoles, lowerHoles) {
+    upperHoles = upperHoles || {};
+    lowerHoles = lowerHoles || {};
+    var upper = [], lower = [];
+    for (var i = 0; i < 26; i++) {
+      upper.push(upperHoles[i] || String.fromCodePoint(upperStart + i));
+      lower.push(lowerHoles[i] || String.fromCodePoint(lowerStart + i));
+    }
+    return { upper: upper, lower: lower };
+  }
+
+  function buildDigits(start) {
+    if (start == null) return null;
+    var d = [];
+    for (var i = 0; i < 10; i++) d.push(String.fromCodePoint(start + i));
+    return d;
+  }
+
+  var ALPHA = {
+    bold: buildAlpha(0x1D400, 0x1D41A),
+    italic: buildAlpha(0x1D434, 0x1D44E, {}, { 7: 'ℎ' }),
+    boldItalic: buildAlpha(0x1D468, 0x1D482),
+    script: buildAlpha(0x1D49C, 0x1D4B6,
+      { 1: 'ℬ', 4: 'ℰ', 5: 'ℱ', 7: 'ℋ', 8: 'ℐ', 11: 'ℒ', 12: 'ℳ', 17: 'ℛ' },
+      { 4: 'ℯ', 6: 'ℊ', 14: 'ℴ' }),
+    boldScript: buildAlpha(0x1D4D0, 0x1D4EA),
+    fraktur: buildAlpha(0x1D504, 0x1D51E,
+      { 2: 'ℭ', 7: 'ℌ', 8: 'ℑ', 17: 'ℜ', 25: 'ℨ' }, {}),
+    boldFraktur: buildAlpha(0x1D56C, 0x1D586),
+    doubleStruck: buildAlpha(0x1D538, 0x1D552,
+      { 2: 'ℂ', 7: 'ℍ', 13: 'ℕ', 15: 'ℙ', 16: 'ℚ', 17: 'ℝ', 25: 'ℤ' }, {}),
+    sans: buildAlpha(0x1D5A0, 0x1D5BA),
+    sansBold: buildAlpha(0x1D5D4, 0x1D5EE),
+    sansItalic: buildAlpha(0x1D608, 0x1D622),
+    sansBoldItalic: buildAlpha(0x1D63C, 0x1D656),
+    monospace: buildAlpha(0x1D670, 0x1D68A)
+  };
+
+  var DIGITS = {
+    bold: buildDigits(0x1D7CE),
+    doubleStruck: buildDigits(0x1D7D8),
+    sans: buildDigits(0x1D7E2),
+    sansBold: buildDigits(0x1D7EC),
+    monospace: buildDigits(0x1D7F6)
+  };
+
+  function convertAlpha(text, alpha, digits) {
+    return Array.from(text).map(function (ch) {
+      var code = ch.charCodeAt(0);
+      if (ch >= 'A' && ch <= 'Z') return alpha.upper[code - 65];
+      if (ch >= 'a' && ch <= 'z') return alpha.lower[code - 97];
+      if (digits && ch >= '0' && ch <= '9') return digits[code - 48];
+      return ch;
+    }).join('');
+  }
+
+  function convertCircled(text) {
+    return Array.from(text).map(function (ch) {
+      var code = ch.charCodeAt(0);
+      if (ch >= 'A' && ch <= 'Z') return String.fromCodePoint(0x24B6 + (code - 65));
+      if (ch >= 'a' && ch <= 'z') return String.fromCodePoint(0x24D0 + (code - 97));
+      if (ch === '0') return '⓪';
+      if (ch >= '1' && ch <= '9') return String.fromCodePoint(0x2460 + (code - 49));
+      return ch;
+    }).join('');
+  }
+
+  function convertSquared(text) {
+    return Array.from(text).map(function (ch) {
+      var code = ch.charCodeAt(0);
+      if (ch >= 'A' && ch <= 'Z') return String.fromCodePoint(0x1F130 + (code - 65));
+      if (ch >= 'a' && ch <= 'z') return String.fromCodePoint(0x1F130 + (code - 97));
+      return ch;
+    }).join('');
+  }
+
+  function convertFullwidth(text) {
+    return Array.from(text).map(function (ch) {
+      var code = ch.charCodeAt(0);
+      if (ch >= 'A' && ch <= 'Z') return String.fromCodePoint(0xFF21 + (code - 65));
+      if (ch >= 'a' && ch <= 'z') return String.fromCodePoint(0xFF41 + (code - 97));
+      if (ch >= '0' && ch <= '9') return String.fromCodePoint(0xFF10 + (code - 48));
+      if (ch === ' ') return '　';
+      return ch;
+    }).join('');
+  }
+
+  var SMALL_CAPS = {
+    a: 'ᴀ', b: 'ʙ', c: 'ᴄ', d: 'ᴅ', e: 'ᴇ', f: 'ꜰ', g: 'ɢ', h: 'ʜ', i: 'ɪ', j: 'ᴊ',
+    k: 'ᴋ', l: 'ʟ', m: 'ᴍ', n: 'ɴ', o: 'ᴏ', p: 'ᴘ', q: 'ǫ', r: 'ʀ', s: 'ꜱ', t: 'ᴛ',
+    u: 'ᴜ', v: 'ᴠ', w: 'ᴡ', x: 'x', y: 'ʏ', z: 'ᴢ'
+  };
+  function convertSmallCaps(text) {
+    return Array.from(text).map(function (ch) {
+      var lower = ch.toLowerCase();
+      return SMALL_CAPS[lower] || ch;
+    }).join('');
+  }
+
+  var SUPER_LOWER = { a:'ᵃ',b:'ᵇ',c:'ᶜ',d:'ᵈ',e:'ᵉ',f:'ᶠ',g:'ᵍ',h:'ʰ',i:'ⁱ',j:'ʲ',k:'ᵏ',l:'ˡ',m:'ᵐ',n:'ⁿ',o:'ᵒ',p:'ᵖ',q:'q',r:'ʳ',s:'ˢ',t:'ᵗ',u:'ᵘ',v:'ᵛ',w:'ʷ',x:'ˣ',y:'ʸ',z:'ᶻ' };
+  var SUPER_UPPER = { a:'ᴬ',b:'ᴮ',c:'C',d:'ᴰ',e:'ᴱ',f:'F',g:'ᴳ',h:'ᴴ',i:'ᴵ',j:'ᴶ',k:'ᴷ',l:'ᴸ',m:'ᴹ',n:'ᴺ',o:'ᴼ',p:'ᴾ',q:'Q',r:'ᴿ',s:'S',t:'ᵀ',u:'ᵁ',v:'ⱽ',w:'ᵂ',x:'X',y:'Y',z:'Z' };
+  var SUPER_DIGIT = { '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹' };
+  function convertSuperscript(text) {
+    return Array.from(text).map(function (ch) {
+      if (ch >= 'a' && ch <= 'z') return SUPER_LOWER[ch] || ch;
+      if (ch >= 'A' && ch <= 'Z') return SUPER_UPPER[ch.toLowerCase()] || ch;
+      if (SUPER_DIGIT[ch]) return SUPER_DIGIT[ch];
+      return ch;
+    }).join('');
+  }
+
+  function convertCombining(text, mark) {
+    return Array.from(text).map(function (ch) { return ch + mark; }).join('');
+  }
+
+  var STYLES = [
+    { id: 'bold', name: 'Bold', convert: function (t) { return convertAlpha(t, ALPHA.bold, DIGITS.bold); } },
+    { id: 'italic', name: 'Italic', convert: function (t) { return convertAlpha(t, ALPHA.italic, null); } },
+    { id: 'boldItalic', name: 'Bold Italic', convert: function (t) { return convertAlpha(t, ALPHA.boldItalic, null); } },
+    { id: 'script', name: 'Script', convert: function (t) { return convertAlpha(t, ALPHA.script, null); } },
+    { id: 'boldScript', name: 'Bold Script', convert: function (t) { return convertAlpha(t, ALPHA.boldScript, null); } },
+    { id: 'fraktur', name: 'Fraktur', convert: function (t) { return convertAlpha(t, ALPHA.fraktur, null); } },
+    { id: 'boldFraktur', name: 'Bold Fraktur', convert: function (t) { return convertAlpha(t, ALPHA.boldFraktur, null); } },
+    { id: 'doubleStruck', name: 'Double-Struck', convert: function (t) { return convertAlpha(t, ALPHA.doubleStruck, DIGITS.doubleStruck); } },
+    { id: 'sans', name: 'Sans', convert: function (t) { return convertAlpha(t, ALPHA.sans, DIGITS.sans); } },
+    { id: 'sansBold', name: 'Sans Bold', convert: function (t) { return convertAlpha(t, ALPHA.sansBold, DIGITS.sansBold); } },
+    { id: 'sansItalic', name: 'Sans Italic', convert: function (t) { return convertAlpha(t, ALPHA.sansItalic, null); } },
+    { id: 'sansBoldItalic', name: 'Sans Bold Italic', convert: function (t) { return convertAlpha(t, ALPHA.sansBoldItalic, null); } },
+    { id: 'monospace', name: 'Monospace', convert: function (t) { return convertAlpha(t, ALPHA.monospace, DIGITS.monospace); } },
+    { id: 'circled', name: 'Circled', convert: convertCircled },
+    { id: 'squared', name: 'Squared', convert: convertSquared },
+    { id: 'fullwidth', name: 'Fullwidth', convert: convertFullwidth },
+    { id: 'smallcaps', name: 'Small Caps', convert: convertSmallCaps },
+    { id: 'superscript', name: 'Superscript', convert: convertSuperscript },
+    { id: 'strikethrough', name: 'Strikethrough', convert: function (t) { return convertCombining(t, '̶'); } },
+    { id: 'underline', name: 'Underline', convert: function (t) { return convertCombining(t, '̲'); } }
+  ];
+
+  var list = document.getElementById('specimenList');
+  STYLES.forEach(function (style) {
+    var row = document.createElement('div');
+    row.className = 'specimen-row';
+    row.innerHTML =
+      '<span class="specimen-row__name">' + style.name + '</span>' +
+      '<span class="specimen-row__output" id="out-' + style.id + '">—</span>' +
+      '<button class="copy-btn" type="button" data-target="out-' + style.id + '" disabled>Copy</button>';
+    list.appendChild(row);
+  });
+
+  var input = document.getElementById('input');
+  var charCount = document.getElementById('charCount');
+  var clearBtn = document.getElementById('clearBtn');
+
+  function render(text) {
+    charCount.textContent = text.length + (text.length === 1 ? ' character' : ' characters');
+    STYLES.forEach(function (style) {
+      var el = document.getElementById('out-' + style.id);
+      var btn = list.querySelector('[data-target="out-' + style.id + '"]');
+      var converted = text ? style.convert(text) : '';
+      el.textContent = converted || '—';
+      el.dataset.raw = converted;
+      btn.disabled = !converted;
+    });
+  }
+
+  function save(text) {
+    try { localStorage.setItem('glyphpress:text', text); } catch (e) {}
+  }
+  function load() {
+    try { return localStorage.getItem('glyphpress:text') || ''; } catch (e) { return ''; }
+  }
+
+  input.addEventListener('input', function () {
+    render(input.value);
+    save(input.value);
+  });
+
+  clearBtn.addEventListener('click', function () {
+    input.value = '';
+    render('');
+    save('');
+    input.focus();
+  });
+
+  function fallbackCopy(text, done) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      done();
+    } catch (e) {}
+  }
+
+  function doCopy(text, feedback) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(feedback, function () { fallbackCopy(text, feedback); });
+    } else {
+      fallbackCopy(text, feedback);
+    }
+  }
+
+  list.addEventListener('click', function (e) {
+    var btn = e.target.closest('.copy-btn');
+    if (!btn || btn.disabled) return;
+    var el = document.getElementById(btn.dataset.target);
+    var text = el.dataset.raw || '';
+    if (!text) return;
+
+    doCopy(text, function () {
+      clearTimeout(btn._copyTimeout);
+      btn.textContent = 'Copied';
+      btn.dataset.copied = 'true';
+      btn._copyTimeout = setTimeout(function () {
+        btn.textContent = 'Copy';
+        delete btn.dataset.copied;
+      }, 1100);
+    });
+  });
+
+  var KAOMOJI = [
+    { category: 'Happy', items: ['(＾▽＾)', '(◕‿◕)', '٩(◕‿◕)۶', 'ヽ(・∀・)ノ', '(⌒‿⌒)'] },
+    { category: 'Love', items: ['(♥‿♥)', '(｡♥‿♥｡)', '(´ε｀ )♡'] },
+    { category: 'Sad', items: ['(╥﹏╥)', '(´；ω；`)', '(っ˘̩╭╮˘̩)っ'] },
+    { category: 'Angry', items: ['(╬ Ò﹏Ó)', 'ヽ(｀Д´)ノ', '(ﾉ｀Д´)ﾉ', '(｀∀´)Ψ'] },
+    { category: 'Surprised', items: ['(⊙_⊙)', 'Σ(°Δ°)', '(°o°)'] },
+    { category: 'Confused', items: ['(・_・;)', '(￣▽￣;)', '(¬_¬)'] },
+    { category: 'Shrug', items: ['¯\\_(ツ)_/¯', 'ᕕ( ᐛ )ᕗ'] },
+    { category: 'Table Flip', items: ['(╯°□°）╯︵ ┻━┻', '┬─┬ ノ( ゜-゜ノ)'] },
+    { category: 'Cute', items: ['(=^･ｪ･^=)', 'ʕ•ᴥ•ʔ', '(◕ᴥ◕)'] },
+    { category: 'Greeting', items: ['(＾ｖ＾)', 'ヾ(＾∇＾)ノ', '(●’◡’●)ﾉ', '| (• ◡•)|'] },
+    { category: 'Cool', items: ['(⌐■_■)', 'ᕙ(⇀‸↼)ᕗ'] }
+  ];
+
+  var kaomojiList = document.getElementById('kaomojiList');
+  KAOMOJI.forEach(function (group) {
+    var catDiv = document.createElement('div');
+    catDiv.className = 'kaomoji-category';
+
+    var label = document.createElement('p');
+    label.className = 'kaomoji-category__label';
+    label.textContent = group.category;
+    catDiv.appendChild(label);
+
+    var row = document.createElement('div');
+    row.className = 'kaomoji-row';
+    group.items.forEach(function (k) {
+      var chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'kaomoji-chip';
+      chip.textContent = k;
+      chip.setAttribute('aria-label', 'Copy ' + k);
+      row.appendChild(chip);
+    });
+    catDiv.appendChild(row);
+
+    kaomojiList.appendChild(catDiv);
+  });
+
+  kaomojiList.addEventListener('click', function (e) {
+    var chip = e.target.closest('.kaomoji-chip');
+    if (!chip) return;
+    var text = chip.textContent;
+
+    doCopy(text, function () {
+      clearTimeout(chip._copyTimeout);
+      chip.dataset.copied = 'true';
+      chip._copyTimeout = setTimeout(function () {
+        delete chip.dataset.copied;
+      }, 700);
+    });
+  });
+
+  var initial = load();
+  input.value = initial;
+  render(initial);
+})();
+
+</script>
+<script>
+(function () {
+  // ---- Install banner (Safari has no native install prompt; this is a
+  // page-drawn substitute, shown once until dismissed). ----
+  var DISMISS_KEY = 'glyphpress:installBannerDismissed';
+  var banner = document.getElementById('installBanner');
+  var textEl = document.getElementById('installBannerText');
+  var dismissBtn = document.getElementById('installBannerDismiss');
+
+  function alreadyInstalled() {
+    try {
+      if (window.navigator.standalone) return true;
+      if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true;
+    } catch (e) {}
+    return false;
+  }
+
+  function dismissed() {
+    try { return localStorage.getItem(DISMISS_KEY) === 'true'; } catch (e) { return false; }
+  }
+
+  function setDismissed() {
+    try { localStorage.setItem(DISMISS_KEY, 'true'); } catch (e) {}
+  }
+
+  dismissBtn.addEventListener('click', function () {
+    setDismissed();
+    banner.classList.remove('show');
+  });
+
+  try {
+    if (alreadyInstalled() || dismissed()) return;
+
+    var ua = navigator.userAgent || '';
+    var isIOS = /iPad|iPhone|iPod/.test(ua) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    var isSafari = /^((?!chrome|android|crios|fxios|edgios).)*safari/i.test(ua);
+    var isMac = /Macintosh/.test(ua) && !isIOS;
+
+    if (isIOS && isSafari) {
+      textEl.innerHTML = 'Add <strong>Glyph Press</strong> to your Home Screen \u2014 tap Share, then "Add to Home Screen".';
+    } else if (isMac && isSafari) {
+      textEl.innerHTML = 'Add <strong>Glyph Press</strong> to your Dock \u2014 File \u2192 "Add to Dock".';
+    } else {
+      return;
+    }
+
+    banner.classList.add('show');
+  } catch (e) {}
+})();
+
+</script>
+</body>
+</html>

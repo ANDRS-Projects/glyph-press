@@ -1,0 +1,13 @@
+{
+  "name": "Glyph Press",
+  "short_name": "Glyph Press",
+  "description": "Type once and get instant Unicode look-alike text styles plus a tap-to-copy kaomoji library.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ECEEE7",
+  "theme_color": "#ECEEE7",
+  "icons": [
+    { "src": "icon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
