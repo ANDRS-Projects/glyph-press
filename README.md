@@ -9,6 +9,9 @@ anywhere.
 
 **Live demo:** https://andrs-projects.github.io/glyph-press/
 
+<img width="1600" height="900" alt="IMG_4480" src="https://github.com/user-attachments/assets/ef024254-644e-4ca9-9050-35ae996637fe" />
+
+
 ## How it works
 
 These aren't real fonts. Each style maps ordinary Latin letters (and
