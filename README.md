@@ -7,7 +7,7 @@ tap-to-copy kaomoji library. Everything is plain Unicode text under the
 hood, so the result pastes cleanly into Messages, Notes, social apps,
 anywhere.
 
-**Live demo:** https://carolinevrauwdeunt-lab.github.io/glyph-press/
+**Live demo:** https://andrs-projects.github.io/glyph-press/
 
 ## How it works
 
@@ -26,7 +26,7 @@ the plain character is used as a fallback.
 
 ## Using it
 
-- Open [the live demo](https://carolinevrauwdeunt-lab.github.io/glyph-press/) in any browser, or
+- Open [the live demo](https://andrs-projects.github.io/glyph-press/) in any browser, or
 - Clone this repo and open `index.html` directly — it's fully
   self-contained (no build step, no dependencies beyond two Google Fonts
   loaded over the network for the display type).
